@@ -5,8 +5,10 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class Map_Ctrl extends UICtrl {
   private blockSize: number = 50;
-  private mapWidth: number = 0;
-  private mapHeight: number = 0;
+  private maxLat: number = 0;
+  private minLat: number = 0;
+  private maxLng: number = 0;
+  private minLng: number = 0;
   private viewWidth: number = 0;
   private viewHeight: number;
 
@@ -19,8 +21,8 @@ export default class Map_Ctrl extends UICtrl {
   private keyCodeMask = 0;
   onLoad() {
     super.onLoad()
-    this.InitMapInfo(50, 30, 30, 10, 16)
-    this.LoadMapAt(3, 3)
+    this.InitMapInfo(50, 499, 499, 10, 16)
+    this.LoadMapAt(490, 490)
 
     cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, (event) => {
       var keyCode = event.keyCode
@@ -58,10 +60,10 @@ export default class Map_Ctrl extends UICtrl {
     }, this)
   }
   private mapSprites: Array<Array<cc.Node>> = [];
-  public InitMapInfo(blockSize: number, mapWidth: number, mapHeight: number, viewWidth: number, viewHeight: number) {
+  public InitMapInfo(blockSize: number, maxLat: number, maxLng: number, viewWidth: number, viewHeight: number) {
     this.blockSize = blockSize
-    this.mapWidth = mapWidth
-    this.mapHeight = mapHeight
+    this.maxLat = maxLat
+    this.maxLng = maxLng
     this.viewWidth = viewWidth
     this.viewHeight = viewHeight
     var index = 0;
@@ -91,7 +93,8 @@ export default class Map_Ctrl extends UICtrl {
     this.mapSprites[i][j].getChildByName("loc").getComponent(cc.Label).string = loc
   }
   public LoadMapAt(beginX: number, beginY: number) {
-    this.orginMapX = this.orginMapY = 0;
+    this.orginMapX = beginX;
+    this.orginMapY = beginY;
 
     for (var i = 0; i < this.viewHeight; i++) {
       for (var j = 0; j < this.viewWidth; j++) {
@@ -157,10 +160,9 @@ export default class Map_Ctrl extends UICtrl {
     pos.y += dy
     this.offsetY += dy
     this.offsetX += dx
-
     // Y向大变化 (按上键)
     if (this.offsetY >= this.blockSize) { //加载条件
-      if (this.orginMapY + this.viewHeight < this.mapHeight) {
+      if (this.orginMapY + this.viewHeight <= this.maxLat) {
         this.orginMapY++;
         this.moveShowItemUp()
         pos.y -= this.blockSize
@@ -170,7 +172,7 @@ export default class Map_Ctrl extends UICtrl {
 
     // Y向小数字变化(按下键)
     if (this.offsetY < -this.blockSize) { //加载条件
-      if (this.orginMapY > -this.mapHeight) {
+      if (this.orginMapY > this.minLat) {
         this.orginMapY--;
         this.moveShowItemDown()
         pos.y += this.blockSize
@@ -179,7 +181,7 @@ export default class Map_Ctrl extends UICtrl {
     }
     // X向大数字变化 (按右键)
     if (this.offsetX < -this.blockSize) { //加载条件
-      if (this.orginMapX + this.viewWidth < this.mapWidth) {
+      if (this.orginMapX + this.viewWidth <= this.maxLng) {
         this.orginMapX++;
         this.moveShowItemLeft()
         pos.x += this.blockSize
@@ -188,7 +190,7 @@ export default class Map_Ctrl extends UICtrl {
     }
     // X向小数字变化 (按左键)
     if (this.offsetX >= this.blockSize) { //加载条件
-      if (this.orginMapX > -this.mapWidth) {
+      if (this.orginMapX > this.minLng) {
         this.orginMapX--;
         this.moveShowItemRight()
         pos.x -= this.blockSize
