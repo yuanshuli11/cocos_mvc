@@ -1,4 +1,4 @@
-import { UICtrl } from "../../Managers/UICtrl";
+import UIMgr, { UICtrl } from "../../Managers/UICtrl";
 
 const {ccclass, property} = cc._decorator;
 
@@ -15,7 +15,7 @@ export default class UIGame_Ctrl extends UICtrl {
     }
 
     private onGameStartClick () {
-        console.log("onGameStartClick")
+        UIMgr.Instance.ShowUI("Map")
     }
 
     // update (dt) {}

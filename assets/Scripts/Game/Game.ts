@@ -25,11 +25,13 @@ export default class Game extends UICtrl{
                 assetType: cc.Prefab,
                 urls:[
                     "UIPrefabs/UIGame",
+                    "UIPrefabs/Map",
                     "UIPrefabs/ResourceLoading",
+                    "UIItemPrefabs/MapItem",
                 ],
             }
         }
-
+      
        ResMgr.Instance.preloadResPkg(resPkg,(now,total)=>{
          if (this.progressBar){
             this.progressBar.progress = now/total
@@ -38,6 +40,7 @@ export default class Game extends UICtrl{
             this.canvas.getChildByName("ResourceLoading").active=false
             this.EnterGameScene()
        })
+       
     }
     public EnterGameScene():void{
 

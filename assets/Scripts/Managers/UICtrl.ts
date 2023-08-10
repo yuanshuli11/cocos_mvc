@@ -9,7 +9,9 @@ import ResMgr  from "./ResMgr";
 
 export  class UICtrl extends cc.Component {
     protected view = {}
-
+    /** 页面状态 */
+    protected _isOpen: boolean = false;
+    
     load_all_object(root, path) {
         for(let i = 0; i < root.childrenCount; i ++) {
             this.view[path + root.children[i].name] = root.children[i];
@@ -23,7 +25,9 @@ export  class UICtrl extends cc.Component {
     start () {
 
     }
-
+    public isOpen(): boolean {
+        return this.isValid() && this._isOpen;
+    }
     public add_button_listen(view_name,caller,func){
         var view_node = this.view[view_name]
         if (!view_node){
@@ -52,11 +56,23 @@ export  default class UIMgr extends cc.Component {
         }   
         this.Canvas = this.node.parent
     }
-
-    public ShowUI( uiName,parent?:cc.Node) {
+    public AddUIItem(uiName,parent?:cc.Node) {
         if (!parent){
             parent = this.Canvas;
         }
+        var prefab = ResMgr.Instance.getAsset("GUI","UIItemPrefabs/"+uiName)
+        if (prefab){
+            var item = cc.instantiate(prefab);
+            parent.addChild(item);
+            return item
+        }
+         
+    }
+    public ShowUI(uiName,parent?:cc.Node) {
+        if (!parent){
+            parent = this.Canvas;
+        }
+        this.ClearAll()
         var prefab = ResMgr.Instance.getAsset("GUI","UIPrefabs/"+uiName)
         var item = null;
         if (prefab){
