@@ -1,0 +1,13 @@
+{
+  "ver": "1.1.3",
+  "uuid": "a11e6e79-b98a-47d0-b694-bedcb446fdd7",
+  "importer": "folder",
+  "isBundle": true,
+  "bundleName": "UIImage",
+  "priority": 1,
+  "compressionType": {},
+  "optimizeHotUpdate": {},
+  "inlineSpriteFrames": {},
+  "isRemoteBundle": {},
+  "subMetas": {}
+}

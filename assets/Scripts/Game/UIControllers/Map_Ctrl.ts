@@ -1,4 +1,5 @@
 import UIMgr, { UICtrl } from "../../Managers/UICtrl";
+import MapItem from "../UIComponents/MapItem";
 
 const { ccclass, property } = cc._decorator;
 
@@ -12,6 +13,10 @@ export default class Map_Ctrl extends UICtrl {
   private viewWidth: number = 0;
   private viewHeight: number;
 
+
+  // 起始点位置
+  private homeX: number = 0;
+  private HomeY: number = 0;
   // 初始位置
   private orginMapX: number = 0;
   private orginMapY: number = 0;
@@ -19,10 +24,14 @@ export default class Map_Ctrl extends UICtrl {
   private offsetY = 0;
   private offsetX = 0;
   private keyCodeMask = 0;
+  private mapBlock: cc.Node = null;
   onLoad() {
+
     super.onLoad()
+    this.mapBlock = this.view["mapBlock"]
+    console.log("==111", this.view)
     this.InitMapInfo(50, 499, 499, 10, 16)
-    this.LoadMapAt(490, 490)
+    this.LoadMapAt(0, 0)
 
     cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, (event) => {
       var keyCode = event.keyCode
@@ -59,7 +68,7 @@ export default class Map_Ctrl extends UICtrl {
       }
     }, this)
   }
-  private mapSprites: Array<Array<cc.Node>> = [];
+  private mapSprites: Array<Array<MapItem>> = [];
   public InitMapInfo(blockSize: number, maxLat: number, maxLng: number, viewWidth: number, viewHeight: number) {
     this.blockSize = blockSize
     this.maxLat = maxLat
@@ -70,29 +79,42 @@ export default class Map_Ctrl extends UICtrl {
     for (var i = 0; i < viewHeight; i++) {
       var lineSprites = [];
       for (var j = 0; j < viewWidth; j++) {
-        var childNode = UIMgr.Instance.AddUIItem("MapItem", this.node.getChildByName("mapBlock"))
+        let childNode = UIMgr.Instance.AddUIItem("MapItem", this.mapBlock)
+        let childObj: MapItem = childNode.addComponent(MapItem)
+        childObj.setMapItemLocation(j, i)
 
-        lineSprites.push(childNode)
-        this.setMapItemLocation(childNode, j, i)
+        lineSprites.push(childObj)
         index++;
       }
       this.mapSprites.push(lineSprites);
     }
   }
-  private setMapItemLocation(mapItemNode: cc.Node, offsetX: number, offsetY: number) {
-    var pos = mapItemNode.getPosition()
-    pos.x += mapItemNode.width * (offsetX - 3)
-    pos.y -= mapItemNode.width * (offsetY - 3)
-    mapItemNode.setPosition(pos)
-  }
+
   // i行 j列 可视化显示的i,j
   private loadMapBlock(i: number, j: number) {
     var mapX = j + this.orginMapX;
     var mapY = i + this.orginMapY;
-    var loc = `(${mapX},${mapY})`
-    this.mapSprites[i][j].getChildByName("loc").getComponent(cc.Label).string = loc
+    this.mapSprites[i][j].setLocation(mapX, mapY, j, i)
+
   }
   public LoadMapAt(beginX: number, beginY: number) {
+    this.homeX = beginX
+    this.HomeY = beginY
+
+    beginX -= 4
+    beginY -= 7
+    if (beginX > this.maxLng - 10) {
+      beginX = this.maxLng - 10
+    }
+    if (beginY > this.maxLat - 10) {
+      beginY = this.maxLat - 10
+    }
+    if (beginX < 5) {
+      beginX = 5
+    }
+    if (beginY < 5) {
+      beginY = 5
+    }
     this.orginMapX = beginX;
     this.orginMapY = beginY;
 
@@ -101,13 +123,28 @@ export default class Map_Ctrl extends UICtrl {
         this.loadMapBlock(i, j)
       }
     }
-  }
 
+  }
+  start(): void {
+    this.initBorderLocation()
+  }
+  private initBorderLocation() {
+    console.log("==ccc", this.orginMapX)
+    var pos = this.mapBlock.getPosition()
+    console.log("==ss", pos.x)
+    if (this.orginMapX <= 10) {
+      pos.x -= 2000
+    }
+    console.log("==ss", pos.x)
+
+    this.mapBlock.setPosition(pos)
+  }
   private moveShowItemUp() {
     // 把 i ---> i - 1,
     for (var i = 1; i < this.viewHeight; i++) {
       for (var j = 0; j < this.viewWidth; j++) {
-        this.mapSprites[i - 1][j].getChildByName("loc").getComponent(cc.Label).string = this.mapSprites[i][j].getChildByName("loc").getComponent(cc.Label).string
+        let offsetObj = this.mapSprites[i][j]
+        this.mapSprites[i - 1][j].setLocation(offsetObj.MapX, offsetObj.MapY, offsetObj.OffsetX, offsetObj.OffsetY)
       }
     }
     //加载新地图快
@@ -120,7 +157,8 @@ export default class Map_Ctrl extends UICtrl {
     // 把 j ---> j - 1,
     for (var i = 0; i < this.viewHeight; i++) {
       for (var j = 1; j < this.viewWidth; j++) {
-        this.mapSprites[i][j - 1].getChildByName("loc").getComponent(cc.Label).string = this.mapSprites[i][j].getChildByName("loc").getComponent(cc.Label).string
+        let offsetObj = this.mapSprites[i][j]
+        this.mapSprites[i][j - 1].setLocation(offsetObj.MapX, offsetObj.MapY, offsetObj.OffsetX, offsetObj.OffsetY)
       }
     }
     //加载新地图快
@@ -133,7 +171,8 @@ export default class Map_Ctrl extends UICtrl {
     // 把 i-1 ---> i ,
     for (var i = this.viewHeight - 1; i > 0; i--) {
       for (var j = 0; j < this.viewWidth; j++) {
-        this.mapSprites[i][j].getChildByName("loc").getComponent(cc.Label).string = this.mapSprites[i - 1][j].getChildByName("loc").getComponent(cc.Label).string
+        let offsetObj = this.mapSprites[i - 1][j]
+        this.mapSprites[i][j].setLocation(offsetObj.MapX, offsetObj.MapY, offsetObj.OffsetX, offsetObj.OffsetY)
       }
     }
     //加载新地图快
@@ -145,7 +184,8 @@ export default class Map_Ctrl extends UICtrl {
     // 把 j-1 ---> j ,
     for (var i = this.viewHeight - 1; i > 0; i--) {
       for (var j = this.viewWidth - 1; j > 0; j--) {
-        this.mapSprites[i][j].getChildByName("loc").getComponent(cc.Label).string = this.mapSprites[i][j - 1].getChildByName("loc").getComponent(cc.Label).string
+        let offsetObj = this.mapSprites[i][j - 1]
+        this.mapSprites[i][j].setLocation(offsetObj.MapX, offsetObj.MapY, offsetObj.OffsetX, offsetObj.OffsetY)
       }
     }
     //加载新地图快
