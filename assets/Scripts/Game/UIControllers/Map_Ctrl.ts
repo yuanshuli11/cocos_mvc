@@ -5,7 +5,7 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class Map_Ctrl extends UICtrl {
-  private blockSize: number = 50;
+  private blockSize: number = 60;
   private maxLat: number = 0;
   private minLat: number = 0;
   private maxLng: number = 0;
@@ -30,8 +30,8 @@ export default class Map_Ctrl extends UICtrl {
     super.onLoad()
     this.mapBlock = this.view["mapBlock"]
     console.log("==111", this.view)
-    this.InitMapInfo(50, 499, 499, 10, 16)
-    this.LoadMapAt(0, 0)
+    this.InitMapInfo(60, 499, 499, 10, 18)
+    this.LoadMapAt(10, 10)
 
     cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, (event) => {
       var keyCode = event.keyCode
@@ -91,36 +91,37 @@ export default class Map_Ctrl extends UICtrl {
   }
 
   // i行 j列 可视化显示的i,j
-  private loadMapBlock(i: number, j: number) {
+  private loadMapBlock(i: number, j: number, offsetX: number, offsetY: number) {
     var mapX = j + this.orginMapX;
     var mapY = i + this.orginMapY;
-    this.mapSprites[i][j].setLocation(mapX, mapY, j, i)
+    console.log("===loadMapBlock ", j, i)
+    this.mapSprites[i][j].setLocation(mapX, mapY, this.mapSprites[i][j].OffsetX + offsetX, this.mapSprites[i][j].OffsetY + offsetY)
 
   }
   public LoadMapAt(beginX: number, beginY: number) {
     this.homeX = beginX
     this.HomeY = beginY
 
-    beginX -= 4
-    beginY -= 7
-    if (beginX > this.maxLng - 10) {
-      beginX = this.maxLng - 10
-    }
-    if (beginY > this.maxLat - 10) {
-      beginY = this.maxLat - 10
-    }
-    if (beginX < 5) {
-      beginX = 5
-    }
-    if (beginY < 5) {
-      beginY = 5
-    }
+    // beginX -= 4
+    // beginY -= 7
+    // if (beginX > this.maxLng - 10) {
+    //   beginX = this.maxLng - 10
+    // }
+    // if (beginY > this.maxLat - 10) {
+    //   beginY = this.maxLat - 10
+    // }
+    // if (beginX < 5) {
+    //   beginX = 5
+    // }
+    // if (beginY < 5) {
+    //   beginY = 5
+    // }
     this.orginMapX = beginX;
     this.orginMapY = beginY;
 
     for (var i = 0; i < this.viewHeight; i++) {
       for (var j = 0; j < this.viewWidth; j++) {
-        this.loadMapBlock(i, j)
+        this.loadMapBlock(i, j, j, i)
       }
     }
 
@@ -133,9 +134,9 @@ export default class Map_Ctrl extends UICtrl {
     var pos = this.mapBlock.getPosition()
     console.log("==ss", pos.x)
     if (this.orginMapX <= 10) {
-      pos.x -= 2000
+      //  pos.x -= 200
     }
-    console.log("==ss", pos.x)
+    // console.log("==ss", pos.x)
 
     this.mapBlock.setPosition(pos)
   }
@@ -149,7 +150,7 @@ export default class Map_Ctrl extends UICtrl {
     }
     //加载新地图快
     for (var j = 0; j < this.viewWidth; j++) {
-      this.loadMapBlock(this.viewHeight - 1, j)
+      this.loadMapBlock(this.viewHeight - 1, j, 0, 1)
     }
   }
 
@@ -163,7 +164,7 @@ export default class Map_Ctrl extends UICtrl {
     }
     //加载新地图快
     for (var j = 0; j < this.viewHeight; j++) {
-      this.loadMapBlock(j, this.viewWidth - 1)
+      this.loadMapBlock(j, this.viewWidth - 1, 1, 0)
     }
   }
 
@@ -177,7 +178,7 @@ export default class Map_Ctrl extends UICtrl {
     }
     //加载新地图快
     for (var j = 0; j < this.viewWidth; j++) {
-      this.loadMapBlock(0, j)
+      this.loadMapBlock(0, j, 0, -1)
     }
   }
   private moveShowItemRight() {
@@ -190,7 +191,7 @@ export default class Map_Ctrl extends UICtrl {
     }
     //加载新地图快
     for (var j = 0; j < this.viewHeight; j++) {
-      this.loadMapBlock(j, 0)
+      this.loadMapBlock(j, 0, -1, 0)
     }
   }
 

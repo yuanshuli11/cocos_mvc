@@ -38,12 +38,15 @@ export default class MapItem extends UICtrl {
         this.setBgImage(offsetX, offsetY)
     }
     setBgImage(offsetX: number, offsetY: number) {
-        this.bgSprite.spriteFrame = ResMgr.Instance.getRes(`mbg_${offsetY + 1}${offsetX}`, cc.SpriteFrame)
+        offsetX = (offsetX % 10 + 10) % 10
+        offsetY = (offsetY % 19 + 19) % 19
+        let bgPath = `mbg_${offsetY + 1}${offsetX}`
+        this.bgSprite.spriteFrame = ResMgr.Instance.getRes(bgPath, cc.SpriteFrame)
     }
     setMapItemLocation(offsetX: number, offsetY: number) {
         var pos = this.node.getPosition()
-        pos.x += this.node.width * (offsetX - 3)
-        pos.y -= this.node.width * (offsetY - 3)
+        pos.x += this.node.width * (offsetX - 2)
+        pos.y -= this.node.width * (offsetY - 2)
         this.setBgImage(offsetX, offsetY)
         this.node.setPosition(pos)
     }
