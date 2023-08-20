@@ -32,6 +32,7 @@ export default class Game extends UICtrl {
                 assetType: cc.SpriteFrame,
                 urls: [
                     "MapImage",
+                    "MapIcons",
                 ],
             }
         }

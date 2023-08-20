@@ -1,5 +1,5 @@
 import UIMgr, { UICtrl } from "../../Managers/UICtrl";
-import MapItem from "../UIComponents/MapItem";
+import MapItem, { Mapdata } from "../UIComponents/MapItem";
 
 const { ccclass, property } = cc._decorator;
 
@@ -94,8 +94,11 @@ export default class Map_Ctrl extends UICtrl {
   private loadMapBlock(i: number, j: number, offsetX: number, offsetY: number) {
     var mapX = j + this.orginMapX;
     var mapY = i + this.orginMapY;
-    console.log("===loadMapBlock ", j, i)
-    this.mapSprites[i][j].setLocation(mapX, mapY, this.mapSprites[i][j].OffsetX + offsetX, this.mapSprites[i][j].OffsetY + offsetY)
+    let orignOffsetX = this.mapSprites[i][j].MapData ? this.mapSprites[i][j].MapData.OffsetX : 0
+    let orignOffsetY = this.mapSprites[i][j].MapData ? this.mapSprites[i][j].MapData.OffsetY : 0
+    var randomInt = Math.floor(Math.random() * 100);
+    var mapInfo = new Mapdata(0, randomInt, mapX, mapY, orignOffsetX + offsetX, orignOffsetY + offsetY)
+    this.mapSprites[i][j].setLocation(mapInfo)
 
   }
   public LoadMapAt(beginX: number, beginY: number) {
@@ -127,7 +130,7 @@ export default class Map_Ctrl extends UICtrl {
 
   }
   start(): void {
-    this.initBorderLocation()
+    //  this.initBorderLocation()
   }
   private initBorderLocation() {
     console.log("==ccc", this.orginMapX)
@@ -145,7 +148,7 @@ export default class Map_Ctrl extends UICtrl {
     for (var i = 1; i < this.viewHeight; i++) {
       for (var j = 0; j < this.viewWidth; j++) {
         let offsetObj = this.mapSprites[i][j]
-        this.mapSprites[i - 1][j].setLocation(offsetObj.MapX, offsetObj.MapY, offsetObj.OffsetX, offsetObj.OffsetY)
+        this.mapSprites[i - 1][j].setLocation(offsetObj.MapData)
       }
     }
     //加载新地图快
@@ -159,7 +162,7 @@ export default class Map_Ctrl extends UICtrl {
     for (var i = 0; i < this.viewHeight; i++) {
       for (var j = 1; j < this.viewWidth; j++) {
         let offsetObj = this.mapSprites[i][j]
-        this.mapSprites[i][j - 1].setLocation(offsetObj.MapX, offsetObj.MapY, offsetObj.OffsetX, offsetObj.OffsetY)
+        this.mapSprites[i][j - 1].setLocation(offsetObj.MapData)
       }
     }
     //加载新地图快
@@ -173,7 +176,7 @@ export default class Map_Ctrl extends UICtrl {
     for (var i = this.viewHeight - 1; i > 0; i--) {
       for (var j = 0; j < this.viewWidth; j++) {
         let offsetObj = this.mapSprites[i - 1][j]
-        this.mapSprites[i][j].setLocation(offsetObj.MapX, offsetObj.MapY, offsetObj.OffsetX, offsetObj.OffsetY)
+        this.mapSprites[i][j].setLocation(offsetObj.MapData)
       }
     }
     //加载新地图快
@@ -183,10 +186,10 @@ export default class Map_Ctrl extends UICtrl {
   }
   private moveShowItemRight() {
     // 把 j-1 ---> j ,
-    for (var i = this.viewHeight - 1; i > 0; i--) {
+    for (var i = this.viewHeight - 1; i >= 0; i--) {
       for (var j = this.viewWidth - 1; j > 0; j--) {
         let offsetObj = this.mapSprites[i][j - 1]
-        this.mapSprites[i][j].setLocation(offsetObj.MapX, offsetObj.MapY, offsetObj.OffsetX, offsetObj.OffsetY)
+        this.mapSprites[i][j].setLocation(offsetObj.MapData)
       }
     }
     //加载新地图快

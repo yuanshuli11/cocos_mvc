@@ -9,19 +9,20 @@ import Game from "./Game/Game"
 import ResMgr from "./Managers/ResMgr";
 import UIMgr from "./Managers/UICtrl";
 
-const {ccclass, property} = cc._decorator;
+const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class GameLanch extends cc.Component {
-    onLoad () {
+    onLoad() {
         this.node.addComponent(ResMgr)
         this.node.addComponent(UIMgr)
         this.node.addComponent(Game)
+        cc.view.enableRetina(true)
     }
 
-    start () {
+    start() {
         Game.Instance.GameStart()
-    } 
+    }
 
     // update (dt) {}
 }
